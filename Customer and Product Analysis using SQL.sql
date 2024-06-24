@@ -24,8 +24,7 @@ LIMIT 10;
 
 --Priority Products for Restocking: Calculates the high performing products that are almost out of stock or completely out of stock.
 
-With 
-low_stock_table AS(
+WITH low_stock_table AS(
 	SELECT o.productcode, 
 		ROUND(SUM(o.quantityordered)*1.0/
 						(SELECT p.quantityinstock
