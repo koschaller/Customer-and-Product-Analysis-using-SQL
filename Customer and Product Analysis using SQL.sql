@@ -24,7 +24,8 @@ LIMIT 10;
 
 --Priority Products for Restocking: Calculates the high performing products that are almost out of stock or completely out of stock.
 
-With low_stock_table AS(
+With 
+low_stock_table AS(
 	SELECT o.productcode, 
 		ROUND(SUM(o.quantityordered)*1.0/
 						(SELECT p.quantityinstock
@@ -35,8 +36,7 @@ With low_stock_table AS(
 	ORDER BY low_stock DESC
 	LIMIT 10
 ),
-
-products_to_restock AS(
+products_to_restock AS( 
 	SELECT productcode, 
 		SUM(quantityordered*priceeach) as performance	
 	FROM orderdetails
@@ -44,7 +44,6 @@ products_to_restock AS(
 	ORDER BY performance DESC
 	LIMIT 10
 )
-
 SELECT productname, 
 	productline
 FROM products
@@ -72,7 +71,7 @@ ORDER BY profit DESC;
 
 --Top 5 Customers with the Highest Profit: Calculates top 5 customers with the highest total profit and provides a customer profile.
 
-WITH customer_profit AS(
+WITH customer_profit AS( 
 	SELECT o.customernumber as customer_number, 
 		SUM(od.quantityordered * (od.priceeach - p.buyprice)) as profit
 			
@@ -84,7 +83,6 @@ WITH customer_profit AS(
 			
 	GROUP BY o.customernumber
 )
-
 SELECT c.contactlastname, 
 		c.contactfirstname, 
 		c.city, 
@@ -102,7 +100,7 @@ LIMIT 5;
 
 --Top 5 Customers with the Lowest Profit: Calculates top 5 customers with the lowest total profit and provides a customer profile.
 
-With customer_profit AS(
+With customer_profit AS(  
 	SELECT o.customernumber as customer_number, 
 		SUM(od.quantityordered * (od.priceeach - p.buyprice)) as profit
 			
@@ -114,7 +112,6 @@ With customer_profit AS(
 			
 	GROUP BY o.customernumber
 )
-
 SELECT c.contactlastname, 
 	c.contactfirstname, 
 	c.city, 
@@ -147,6 +144,5 @@ WITH customer_profits AS(
 	GROUP BY o.customernumber
 	ORDER BY profit DESC
 )
-
 SELECT AVG(profit)
 FROM customer_profits;
