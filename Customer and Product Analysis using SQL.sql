@@ -2,10 +2,10 @@
 --Low Stock: Calculates the top 10 products that are almost out of stock or completely out of stock.
 
 SELECT o.productcode, 
-		ROUND(SUM(o.quantityordered)*1.0/
-							(SELECT p.quantityinstock
-							 FROM products p
-							 WHERE o.productcode = p.productcode),2) as low_stock
+	ROUND(SUM(o.quantityordered)*1.0/
+					(SELECT p.quantityinstock
+					 FROM products p
+					 WHERE o.productcode = p.productcode),2) as low_stock
 
 FROM orderdetails o
 
@@ -17,7 +17,7 @@ LIMIT 10;
 --Product Performance: Calulates the top 10 products with the highest sum of sales.
 
 SELECT productcode, 
-		SUM(quantityordered*priceeach) as performance
+	SUM(quantityordered*priceeach) as performance
 
 FROM orderdetails
 
@@ -29,36 +29,36 @@ LIMIT 10;
 --Priority Products for Restocking: Calculates the high performing products that are almost out of stock or completely out of stock.
 
 With low_stock_table AS(
-		SELECT o.productcode, 
-				ROUND(SUM(o.quantityordered)*1.0/
-									(SELECT p.quantityinstock
-									 FROM products p
-									 WHERE o.productcode = p.productcode),2) as low_stock
-		FROM orderdetails o
+	SELECT o.productcode, 
+		ROUND(SUM(o.quantityordered)*1.0/
+						(SELECT p.quantityinstock
+						 FROM products p
+						 WHERE o.productcode = p.productcode),2) as low_stock
+	FROM orderdetails o
 		
-		GROUP BY o.productcode
-		ORDER BY low_stock DESC
-		LIMIT 10
+	GROUP BY o.productcode
+	ORDER BY low_stock DESC
+	LIMIT 10
 ),
 
 products_to_restock AS(
-		SELECT productcode, 
-				SUM(quantityordered*priceeach) as performance
+	SELECT productcode, 
+		SUM(quantityordered*priceeach) as performance
 		
-		FROM orderdetails
+	FROM orderdetails
 		
-		GROUP BY productcode
-		ORDER BY performance DESC
-		LIMIT 10
+	GROUP BY productcode
+	ORDER BY performance DESC
+	LIMIT 10
 )
 
 SELECT productname, 
-		productline
+	productline
 
 FROM products
 
 WHERE productcode IN (SELECT productcode
-						FROM products_to_restock);
+					FROM products_to_restock);
 		
 		
 		
@@ -66,13 +66,13 @@ WHERE productcode IN (SELECT productcode
 --Customer Profit: Calculates the total profit for each customer. 
 
 SELECT o.customernumber, 
-		SUM(od.quantityordered * (od.priceeach - p.buyprice)) as profit
+	SUM(od.quantityordered * (od.priceeach - p.buyprice)) as profit
 
 FROM orders o
 LEFT JOIN orderdetails od
-		ON o.ordernumber =od.ordernumber
+	ON o.ordernumber =od.ordernumber
 LEFT JOIN products p
-		ON p.productcode = od.productcode
+	ON p.productcode = od.productcode
 
 GROUP BY o.customernumber
 ORDER BY profit DESC;
@@ -81,16 +81,16 @@ ORDER BY profit DESC;
 --Top 5 Customers with the Highest Profit: Calculates top 5 customers with the highest total profit and provides a customer profile.
 
 WITH customer_profit AS(
-			SELECT o.customernumber as customer_number, 
-					SUM(od.quantityordered * (od.priceeach - p.buyprice)) as profit
+	SELECT o.customernumber as customer_number, 
+		SUM(od.quantityordered * (od.priceeach - p.buyprice)) as profit
 			
-			FROM orders o
-			LEFT JOIN orderdetails od
-					ON o.ordernumber =od.ordernumber
-			LEFT JOIN products p
-					ON p.productcode = od.productcode
+	FROM orders o
+	LEFT JOIN orderdetails od
+		ON o.ordernumber =od.ordernumber
+	LEFT JOIN products p
+		ON p.productcode = od.productcode
 			
-			GROUP BY o.customernumber
+	GROUP BY o.customernumber
 )
 
 SELECT c.contactlastname, 
@@ -101,7 +101,7 @@ SELECT c.contactlastname,
 
 FROM customers c
 LEFT JOIN customer_profit cp
-		ON c.customernumber = cp.customer_number
+	ON c.customernumber = cp.customer_number
 
 WHERE cp.profit IS NOT NULL 
 ORDER BY cp.profit DESC
@@ -111,16 +111,16 @@ LIMIT 5;
 --Top 5 Customers with the Lowest Profit: Calculates top 5 customers with the lowest total profit and provides a customer profile.
 
 With customer_profit AS(
-			SELECT o.customernumber as customer_number, 
-					SUM(od.quantityordered * (od.priceeach - p.buyprice)) as profit
+	SELECT o.customernumber as customer_number, 
+		SUM(od.quantityordered * (od.priceeach - p.buyprice)) as profit
 			
-			FROM orders o
-			LEFT JOIN orderdetails od
-					ON o.ordernumber =od.ordernumber
-			LEFT JOIN products p
-					ON p.productcode = od.productcode
+	FROM orders o
+	LEFT JOIN orderdetails od
+		ON o.ordernumber =od.ordernumber
+	LEFT JOIN products p
+		ON p.productcode = od.productcode
 			
-			GROUP BY o.customernumber
+	GROUP BY o.customernumber
 )
 
 SELECT c.contactlastname, 
@@ -131,7 +131,7 @@ SELECT c.contactlastname,
 
 FROM customers c
 LEFT JOIN customer_profit cp
-		ON c.customernumber = cp.customer_number
+	ON c.customernumber = cp.customer_number
 
 WHERE cp.profit IS NOT NULL 
 ORDER BY cp.profit ASC
@@ -143,17 +143,17 @@ LIMIT 5;
 --Average Customer Profit: Calculates the average total profit among all customers. 
 
 WITH customer_profits AS(
-			SELECT o.customernumber, 
-				   SUM(od.quantityordered * (od.priceeach - p.buyprice)) as profit
+	SELECT o.customernumber, 
+		SUM(od.quantityordered * (od.priceeach - p.buyprice)) as profit
 			
-			FROM orders o
-			LEFT JOIN orderdetails od
-					ON o.ordernumber =od.ordernumber
-			LEFT JOIN products p
-					ON p.productcode = od.productcode
+	FROM orders o
+	LEFT JOIN orderdetails od
+		ON o.ordernumber =od.ordernumber
+	LEFT JOIN products p
+		ON p.productcode = od.productcode
 			
-			GROUP BY o.customernumber
-			ORDER BY profit DESC
+	GROUP BY o.customernumber
+	ORDER BY profit DESC
 )
 
 SELECT AVG(profit)
