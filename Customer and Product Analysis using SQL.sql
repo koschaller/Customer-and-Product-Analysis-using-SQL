@@ -6,9 +6,7 @@ SELECT o.productcode,
 					(SELECT p.quantityinstock
 					 FROM products p
 					 WHERE o.productcode = p.productcode),2) as low_stock
-
 FROM orderdetails o
-
 GROUP BY o.productcode
 ORDER BY low_stock DESC
 LIMIT 10;
@@ -18,9 +16,7 @@ LIMIT 10;
 
 SELECT productcode, 
 	SUM(quantityordered*priceeach) as performance
-
 FROM orderdetails
-
 GROUP BY productcode
 ORDER BY performance DESC
 LIMIT 10;
@@ -35,7 +31,6 @@ With low_stock_table AS(
 						 FROM products p
 						 WHERE o.productcode = p.productcode),2) as low_stock
 	FROM orderdetails o
-		
 	GROUP BY o.productcode
 	ORDER BY low_stock DESC
 	LIMIT 10
@@ -43,10 +38,8 @@ With low_stock_table AS(
 
 products_to_restock AS(
 	SELECT productcode, 
-		SUM(quantityordered*priceeach) as performance
-		
+		SUM(quantityordered*priceeach) as performance	
 	FROM orderdetails
-		
 	GROUP BY productcode
 	ORDER BY performance DESC
 	LIMIT 10
@@ -54,11 +47,10 @@ products_to_restock AS(
 
 SELECT productname, 
 	productline
-
 FROM products
-
-WHERE productcode IN (SELECT productcode
-					FROM products_to_restock);
+WHERE productcode 
+	IN (SELECT productcode
+		FROM products_to_restock);
 		
 		
 		
@@ -124,10 +116,10 @@ With customer_profit AS(
 )
 
 SELECT c.contactlastname, 
-		c.contactfirstname, 
-		c.city, 
-		c.country, 
-		cp.profit
+	c.contactfirstname, 
+	c.city, 
+	c.country, 
+	cp.profit
 
 FROM customers c
 LEFT JOIN customer_profit cp
